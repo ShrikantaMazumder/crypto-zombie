@@ -17,7 +17,11 @@ contract ZombieFactory {
     mapping (uint => address) public zombieToOwner;
     mapping (address => uint) ownerZombieCount;
 
-    function _createZombie(string memory _name, uint _dna) private {
+    // internal type is also like private
+    // main difference is that internal type function is available in other contracts
+    // that is inherited
+    // but private type function can not use in inherited contracts
+    function _createZombie(string memory _name, uint _dna) internal {
         uint id = zombies.push(Zombie(_name, _dna)) - 1;
         zombieToOwner[id] = msg.sender;
         ownerZombieCount[msg.sender]++;
