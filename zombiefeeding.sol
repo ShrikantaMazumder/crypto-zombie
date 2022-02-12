@@ -24,8 +24,11 @@ contract KittyInterface {
 
 // inheriting ZombieFactory
 contract ZombieFeeding is ZombieFactory {
-    address ckAddress = 0x06012c8cf97BEaD5deAe237070F9587f8E7A266d;
-    KittyInterface kittyContract = KittyInterface(ckAddress);
+    KittyInterface kittyContract;
+
+    function setKittyContractAddress(address _address) external {
+        kittyContract = KittyInterface(_address);
+    }
 
     // two types of data location
     // storage - it stores data on blockchain permanently. It's like to store on hard disk
