@@ -26,16 +26,29 @@ contract KittyInterface {
 contract ZombieFeeding is ZombieFactory {
     KittyInterface kittyContract;
 
-    function setKittyContractAddress(address _address) external {
+    function setKittyContractAddress(address _address) external onlyOwner {
         kittyContract = KittyInterface(_address);
+    }
+
+    function _triggerCooldown(Zombie storage _zombie) internal {
+        _zombie.readyTime = uint32(now + cooldownTime);
+    }
+
+    function _isReady(Zombie storage _zombie) internal view returns (bool) {
+        return (_zombie.readyTime <= now);
     }
 
     // two types of data location
     // storage - it stores data on blockchain permanently. It's like to store on hard disk
     // memory - it's a temporary location like RAM
-    function feedAndMultiply(uint256 _zombieId, uint256 _targetDna, string memory _species) public {
+    function feedAndMultiply(
+        uint256 _zombieId,
+        uint256 _targetDna,
+        string memory _species
+    ) internal {
         require(msg.sender == zombieToOwner[_zombieId]);
         Zombie storage myZombie = zombies[_zombieId];
+        require(_isReady(myZombie));
 
         // be sure that target dna length is equal to 16
         _targetDna = _targetDna % dnaModulus;
@@ -43,15 +56,19 @@ contract ZombieFeeding is ZombieFactory {
         // create new dna from zombieId and targetDna
         uint256 newDna = (myZombie.dna + _targetDna) / 2;
 
-        if(keccak256(abi.encodePacked(_species)) == keccak256(abi.encodePacked("kitty"))) {
-            newDna = newDna - newDna % 100 + 99;
+        if (
+            keccak256(abi.encodePacked(_species)) ==
+            keccak256(abi.encodePacked("kitty"))
+        ) {
+            newDna = newDna - (newDna % 100) + 99;
         }
 
         _createZombie("NoName", newDna);
+        _triggerCooldown(myZombie);
     }
 
-    function feedOnKitty(uint _zombieId, uint _kittyId) public {
-        uint kittyDna;
-        (,,,,,,,,,kittyDna) = kittyContract.getKitty(_kittyId);
+    function feedOnKitty(uint256 _zombieId, uint256 _kittyId) public {
+        uint256 kittyDna;
+        (, , , , , , , , , kittyDna) = kittyContract.getKitty(_kittyId);
     }
 }
