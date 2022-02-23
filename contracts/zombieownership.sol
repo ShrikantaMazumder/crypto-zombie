@@ -23,7 +23,7 @@ contract ZombieOwnership is ZombieAttack, ERC721 {
         address _to,
         uint256 _tokenId
     ) private {
-        ownerZombieCount[_to] = ownerZombieCount[_to].sum(1);
+        ownerZombieCount[_to] = ownerZombieCount[_to].add(1);
         ownerZombieCount[_from] = ownerZombieCount[_from].sub(1);
         zombieToOwner[_tokenId] = _to;
         emit Transfer(_from, _to, _tokenId);
@@ -41,8 +41,8 @@ contract ZombieOwnership is ZombieAttack, ERC721 {
         _transfer(_from, _to, _tokenId);
     }
 
-    function approve(address _approved, uint256 _tokenId) external payable onlyOwnerOf(_approved) {
+    function approve(address _approved, uint256 _tokenId) external payable onlyOwnerOf(_tokenId) {
         zombieApprovals[_tokenId] = _approved;
-        Approval(msg.sender, _approved, _tokenId);
+        emit Approval(msg.sender, _approved, _tokenId);
     }
 }
