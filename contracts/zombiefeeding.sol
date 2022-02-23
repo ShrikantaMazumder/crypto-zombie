@@ -1,4 +1,4 @@
-pragma solidity >=0.5.0 <0.6.0;
+pragma solidity >0.5.0;
 
 import "./zombiefactory.sol";
 
@@ -26,7 +26,7 @@ contract KittyInterface {
 contract ZombieFeeding is ZombieFactory {
     KittyInterface kittyContract;
 
-    modifier onlyOwnerOf(uint _zombieId) {
+    modifier onlyOwnerOf(uint256 _zombieId) {
         require(msg.sender == zombieToOwner[_zombieId]);
         _;
     }
